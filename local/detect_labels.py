@@ -1,6 +1,8 @@
 import os
 from google.cloud import vision
 
+from IPython import embed
+
 def detect_labels_uri(uri):
     """Detects labels in the file located in Google Cloud Storage or on the
     Web."""
@@ -11,11 +13,17 @@ def detect_labels_uri(uri):
 
     response = client.label_detection(image=image)
     labels = response.label_annotations
-    print('Labels:')
 
-    print(labels)
+    labels_data = []
     for label in labels:
-        print(label.description)
+        label_data = {
+            "mid": label.mid,
+            "description": label.description,
+            "score": label.score
+        }
+        labels_data.append(label_data)
+
+    return labels_data
 
     if response.error.message:
         raise Exception(
@@ -26,4 +34,4 @@ def detect_labels_uri(uri):
 if __name__ == '__main__':
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'./service_account.json'
     url = 'gs://pixamon_images/cat.jpeg'
-    detect_labels_uri(url)
+    print(detect_labels_uri(url))
